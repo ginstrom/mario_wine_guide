@@ -5,24 +5,9 @@ This project is a web application that displays an interactive map of Italy. Use
 
 ## Table of Contents
 
-1. [Prerequisites](#prerequisites)
-2. [Setup Instructions](#installation)
-3. [Usage](#usage)
-4. [License](#license)
-
-
-## Prerequisites
-
-Before running the application, ensure you have the following installed:
-
-**Ollama**: A tool for running and interacting with the Llama3.2 model. You can download and install Ollama from [here](https://ollama.com/).
-
-**Llama3.2 Model**: The base model required for the AI agent.
-
-**Mario Agent**: Create the Mario agent using the provided Modelfile. Run the following command in your terminal:
-  ```sh
-  ollama create mario -f /path/to/Modelfile
-```
+1. [Setup Instructions](#installation)
+2. [Usage](#usage)
+3. [License](#license)
 
 
 ## Setup Instructions
