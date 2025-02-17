@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return d3Color.darker(factor).toString();
     }
 
-    // Function to update the popup content
+    // Function to update the info-box content
     function updatePopupContent(content) {
         document.getElementById('info-box').innerHTML = content;
     }

@@ -1,0 +1,31 @@
+services:
+  # Flask Application
+  flask_app:
+    build: .
+    image: int_map-img
+    container_name: int_map-cnt 
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/code
+    working_dir: /code
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - FLASK_APP=app.py
+      - FLASK_DEBUG=1         # Enable debug mode
+      - PYTHONUNBUFFERED=1    # Force logs to show immediately
+
+  # Ollama Service
+  ollama:
+    image: ollama/ollama
+    container_name: ollama_mario-cnt
+    ports:
+      - "11434:11434"
+    volumes:
+      - ~/ollama_models:/root/.ollama
+
+# Volumes for persistent data
+volumes:
+  ollama_models:

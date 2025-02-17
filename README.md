@@ -27,31 +27,48 @@ Before running the application, ensure you have the following installed:
 
 ## Setup Instructions
 
-### Clone the Repository:
+### 1. Clone the Repository:
 ```sh
 git clone https://github.com/alexpederneschi/mario_wine_guide.git
 cd mario_wine_guide
 ```
 
-### Set up a virtual environment
+### 2. Set Up Ollama and the Llama3.2 Model:
+Pull the Ollama Docker image:
 ```sh
-python -m venv venv
-source venv/bin/activate
+docker pull ollama/ollama
+```
+Run the Ollama container and mount a volume for the model storage. Replace ~/ollama_models with the desired path on your host machine:
+```sh
+docker run -d -v ~/ollama_models:/root/.ollama -p 11434:11434 --name ollama-cnt ollama/ollama
+```
+Create the Mario AI agent using the Modelfile included in the project:
+```sh
+docker exec -it ollama-cnt ollama create mario -f /path/to/Modelfile
+```
+Once the Mario AI agent is created, you can stop and remove the ollama-cnt container.
+```sh
+docker stop ollama-cnt
+docker rm ollama-cnt
 ```
 
-### Install Python Dependencies:
+### 3. Update Docker Compose Configuration:
+Ensure the docker-compose.yml file points to the correct volume for the Ollama models. For example:
 ```sh
-pip install -r requirements.txt
+volumes:
+  - ~/ollama_models:/root/.ollama
 ```
 
-### Run the Application:
+### 4. Use Docker Compose to build and run the application:
 ```sh
-python app.py
+docker-compose up --build
 ```
 
-### Open your browser and navigate to:
+### 5. Access the Application:
+Once the containers are running, open your browser and navigate to:
+```sh
 http://localhost:5000
-
+```
 
 ## Usage
 Interactive Map: The application displays a map of Italy. Users can select a region by clicking on it.
@@ -63,4 +80,3 @@ General Information: By default, the application displays introductory informati
 
 ## License
 This project is licensed under the MIT License. Feel free to use, modify, and distribute it as needed.
-
