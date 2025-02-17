@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Italy Region Selector</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Pacifico&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h1 id="title">
+    <span class="color1">Your Alco</span><span class="color2">holic Tou</span><span class="color3">rist Guide</span>
+  </h1>
+
+    <!-- Hidden templates -->
+    <div style="display: none;">
+      <!-- General info template -->
+      <div id="general-info">
+          <h3>ABOUT ME</h3>
+          <p>{{ general_info }}</p>
+      </div>
+        <!-- Region info template -->
+        <div id="region-template">
+          <h3 id="region-name-placeholder"></h3>
+          <p id="region-info-placeholder"></p>
+        </div>
+    </div>
+
+    <!-- Wrapper for the two side-by-side containers -->
+    <div class="container-wrapper">
+        <!-- Custom persistent popup container -->
+        <div id="info-box">
+            <!-- Initial content will be populated by JavaScript -->
+        </div>
+
+        <!-- Map container -->
+        <div id="map-container">
+          <img id="map-logo" src="{{ url_for('static', filename='data/italia_alcolica.png') }}" alt="Logo">
+          <div id="map"></div>
+          <p>Right container content</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"
+            data-geojson-path="{{ url_for('static', filename='data/italy_regions_epsg4326.geojson') }}"></script>
+</body>
+</html>

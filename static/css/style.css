@@ -1,0 +1,126 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevents scrollbars */
+}
+
+/* Add a background image to the body */
+body {
+    background-image: url('../data/background_bottles.jpg'); /* Replace with your image path */
+    background-size: cover; /* Ensure the image covers the entire background */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Prevent the image from repeating */
+    background-attachment: fixed; /* Fix the background image in place */
+}
+
+/* Style the title */
+#title {
+    text-align: center;
+    font-size: clamp(2rem, 5vw, 10rem); /* Shrinks between 1.5em and 2em based on viewport width */
+    margin-top: 1%; /* Add space above the title */
+    font-family: 'Dancing Script', cursive; /* Use a fancy Google Font */
+    text-shadow: 1% 2% 4% rgba(0, 0, 0, 0.5); /* Add a shadow for depth */
+    animation: fadeIn 5s ease-in-out; /* Add a fade-in animation */
+    border: 10% solid rgba(0, 0, 0, 0.5); /* Subtle border for contrast */
+}
+
+.color1 {
+    color: #1ccc5f; /* First color */
+  }
+  
+  .color2 {
+    color: hwb(0 100% 0%); /* Second color */
+  }
+  
+  .color3 {
+    color: #cc1c1c; /* Third color */
+  }
+
+/* Fade-in animation for the title */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Container wrapper to center the two containers */
+.container-wrapper {
+    width: 80%;
+    height: 75%;
+    max-width: 1200px;
+    padding-left: 5%;
+    padding-right: 5%;
+    margin: 0 auto; /* Centers the container */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 5%;
+    flex-wrap: nowrap;  /* Prevent wrapping too early */
+}
+
+/* Custom persistent popup styling */
+#info-box {
+    flex: 3 1 30%; /* Grow, shrink, start at 250px */
+    width: 100%;              /* But it can shrink responsively */
+    height: 100%;
+    box-sizing: border-box;
+    padding: 2%;
+    background-color: #f5f7ea;
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    box-shadow: 0 4 15px rgba(0, 0, 0, 0.2);
+    font-family: Arial, sans-serif;
+    overflow-y: auto; /* Add scroll if content overflows */
+    container-type: inline-size; /* Enable container queries */
+}
+
+#info-box h3 {
+    margin: 0 0 5%;
+    font-size: clamp(0.2rem, 5cqw, 1.5rem); /* Responsive font size */
+    color: #333;
+    text-align: center;
+}
+
+#info-box p {
+    margin: 0;
+    font-size: clamp(0.1rem, 4cqw, 1.2rem); /* Responsive font size */
+    color: #666;
+    line-height: 1.6;
+}
+
+/* Style the map container */
+#map-container {
+    flex: 4 1 40%; /* Grow twice as much as left, shrink, start at 500px */
+    width: 100%; /* But it can shrink responsively */
+    height: 100%;
+    border-radius: 10px; /* Increase border-radius for more rounded corners */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Add a stronger shadow for depth */
+    background-color: #f5f7ea; /* Add a semi-transparent white background */
+    backdrop-filter: blur(10px); /* Increase blur effect for a frosted glass look */
+    overflow: hidden; /* Ensure content inside the container doesn't overflow rounded corners */
+    position: relative; /* Allows absolute positioning of child elements */
+}
+
+/* Style the image */
+#map-logo {
+    position: absolute; /* Position the image absolutely within the container */
+    width: 25%;
+    height: auto;
+    object-fit: contain; /* Ensures the image fits within the container without stretching */
+    display: block; /* Removes extra space below the image */
+    margin-top: 20%; 
+    margin-left:60%; 
+    z-index: 2;
+}
+
+/* Style the map itself */
+#map {
+    width: 100%; /* Map takes up the full width of the container */
+    height: 100%; /* Map takes up the full height of the container */
+    background-color: #f5f7ea;
+    z-index: 1;
+}
