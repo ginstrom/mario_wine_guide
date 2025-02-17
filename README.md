@@ -44,7 +44,7 @@ volumes:
   - ~/ollama_models:/root/.ollama
 ```
 
-### 4. Use Docker Compose to build and run the application:
+### 4. Use Docker Compose to Build and Run the Application:
 ```sh
 docker-compose up --build
 ```
