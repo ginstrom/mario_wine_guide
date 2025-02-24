@@ -1,0 +1,6 @@
+.vscode/
+*.pyc
+__pycache__/
+.coverage
+*.bak
+saves/*.json
