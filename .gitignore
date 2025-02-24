@@ -1,6 +1,29 @@
-.vscode/
-*.pyc
+# Python
 __pycache__/
+*.py[cod]
+*.so
+build/
+dist/
+*.egg-info/
+.env
+venv/
 .coverage
-*.bak
-saves/*.json
+.pytest_cache/
+
+# IDE and editors
+.idea/
+.vscode/
+*.sw[po]
+
+# System
+.DS_Store
+Thumbs.db
+
+# Project specific
+galaxy-conquest-game/saves/*
+!galaxy-conquest-game/saves/.gitkeep
+cline_docs/
+
+# Logs and temp
+*.log
+logs/
