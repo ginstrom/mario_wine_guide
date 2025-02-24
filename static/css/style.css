@@ -92,6 +92,48 @@ body {
     line-height: 1.6;
 }
 
+/* Error message styling */
+.error-info {
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fff3f3;
+    border: 1px solid #ffcdd2;
+}
+
+.error-message {
+    color: #d32f2f !important;
+    font-weight: 500;
+    margin-bottom: 15px !important;
+}
+
+/* Loading state styling */
+.loading-info {
+    padding: 20px;
+    text-align: center;
+}
+
+/* Retry button styling */
+.retry-button {
+    display: block;
+    margin: 15px auto;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: clamp(0.8rem, 3cqw, 1rem);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.retry-button:hover {
+    background-color: #45a049;
+}
+
+.retry-button:active {
+    background-color: #3d8b40;
+}
+
 /* Style the map container */
 #map-container {
     flex: 4 1 40%; /* Grow twice as much as left, shrink, start at 500px */
