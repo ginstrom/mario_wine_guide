@@ -41,6 +41,10 @@ If the application doesn't start:
 - Ensure Docker has access to at least 16GB of RAM
 - Try stopping and restarting with `docker-compose down` followed by `docker-compose up --build`
 
+## Credits
+
+This project was originally created by [Alex Pederneschi](https://github.com/alexpederneschi).
+
 ## License
 
 MIT License - Feel free to use and modify as needed.
