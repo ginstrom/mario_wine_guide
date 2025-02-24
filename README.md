@@ -11,7 +11,7 @@ An interactive map that helps you discover Italian wines and spirits. Click on a
 
 1. Clone the repository:
 ```sh
-git clone https://github.com/alexpederneschi/mario_wine_guide.git
+git clone https://github.com/ginstrom/mario_wine_guide.git
 cd mario_wine_guide
 ```
 
