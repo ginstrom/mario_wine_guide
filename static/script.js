@@ -124,6 +124,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         const regionName = feature.properties.reg_name;
                         console.log("Selected Region:", regionName);
                     
+                        // Show loading state
+                        updatePopupContent(`
+                            <div class="loading-info">
+                                <h2>${regionName}</h2>
+                                <p>Loading region information...</p>
+                            </div>
+                        `);
+
                         // Fetch region info from Flask backend
                         console.log('Fetching region info from backend for:', regionName);
                         fetch('/get_region_info', {
@@ -135,16 +143,32 @@ document.addEventListener('DOMContentLoaded', function () {
                         })
                         .then(response => {
                             console.log('Backend response status:', response.status);
+                            // Store request ID from headers if available
+                            const requestId = response.headers.get('X-Request-ID');
+                            if (requestId) {
+                                console.log('Request ID:', requestId);
+                            }
+                            
+                            // Check if response is ok before parsing JSON
+                            if (!response.ok) {
+                                return response.json().then(errorData => {
+                                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                                });
+                            }
                             return response.json();
                         })
                         .then(data => {
                             console.log("Flask Response:", data);
+                            
+                            if (data.error) {
+                                throw new Error(data.error);
+                            }
                     
                             // Clone the region template
                             const template = document.getElementById('region-template');
                             if (!template) {
                                 console.error('Region template element not found');
-                                return;
+                                throw new Error('Template not found');
                             }
                             const clonedTemplate = template.cloneNode(true);
                             clonedTemplate.style.display = 'block';
@@ -158,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                     nameFound: !!nameElement,
                                     infoFound: !!infoElement
                                 });
-                                return;
+                                throw new Error('Template placeholders not found');
                             }
 
                             nameElement.textContent = regionName;
@@ -173,8 +197,101 @@ document.addEventListener('DOMContentLoaded', function () {
                                 message: error.message,
                                 stack: error.stack
                             });
-                            updatePopupContent("Failed to load region information."); // Fallback
+                            
+                            // Determine if the error is retryable
+                            const isRetryable = error.message.includes('timeout') || 
+                                              error.message.includes('connect') ||
+                                              error.message.includes('try again');
+                            
+                            // Create retry button if applicable
+                            const retryButton = isRetryable ? `
+                                <button onclick="retryRegionFetch('${regionName}')" class="retry-button">
+                                    Try Again
+                                </button>
+                            ` : '';
+                            
+                            // Display a more informative error message
+                            updatePopupContent(`
+                                <div class="error-info">
+                                    <h2>${regionName}</h2>
+                                    <p class="error-message">
+                                        ${error.message || "Failed to load region information."}
+                                    </p>
+                                    ${retryButton}
+                                </div>
+                            `);
                         });
+
+                        // Add the retry function to the window object
+                        window.retryRegionFetch = function(regionName) {
+                            console.log('Retrying fetch for region:', regionName);
+                            // Show loading state
+                            updatePopupContent(`
+                                <div class="loading-info">
+                                    <h2>${regionName}</h2>
+                                    <p>Retrying to load region information...</p>
+                                </div>
+                            `);
+                            
+                            // Retry the fetch
+                            fetch('/get_region_info', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ region: regionName }),
+                            })
+                            .then(response => {
+                                console.log('Backend response status:', response.status);
+                                const requestId = response.headers.get('X-Request-ID');
+                                if (requestId) {
+                                    console.log('Request ID:', requestId);
+                                }
+                                
+                                if (!response.ok) {
+                                    return response.json().then(errorData => {
+                                        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                                    });
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.error) {
+                                    throw new Error(data.error);
+                                }
+                                
+                                const template = document.getElementById('region-template');
+                                if (!template) {
+                                    throw new Error('Template not found');
+                                }
+                                const clonedTemplate = template.cloneNode(true);
+                                clonedTemplate.style.display = 'block';
+                                
+                                const nameElement = clonedTemplate.querySelector('#region-name-placeholder');
+                                const infoElement = clonedTemplate.querySelector('#region-info-placeholder');
+                                
+                                if (!nameElement || !infoElement) {
+                                    throw new Error('Template placeholders not found');
+                                }
+                                
+                                nameElement.textContent = regionName;
+                                infoElement.textContent = data.info;
+                                
+                                updatePopupContent(clonedTemplate.innerHTML);
+                            })
+                            .catch(error => {
+                                console.error('Error in retry attempt:', error);
+                                updatePopupContent(`
+                                    <div class="error-info">
+                                        <h2>${regionName}</h2>
+                                        <p class="error-message">
+                                            ${error.message || "Failed to load region information."}
+                                        </p>
+                                        <p>Please try again later.</p>
+                                    </div>
+                                `);
+                            });
+                        };
                     
                         window.selectedLayer = layer;
                     });
