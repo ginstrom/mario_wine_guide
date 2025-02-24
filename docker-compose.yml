@@ -10,7 +10,8 @@ services:
       - .:/code
     working_dir: /code
     depends_on:
-      - ollama
+      ollama:
+        condition: service_healthy
     environment:
       - OLLAMA_HOST=http://ollama:11434
       - FLASK_APP=app.py
@@ -19,12 +20,23 @@ services:
 
   # Ollama Service
   ollama:
-    image: ollama/ollama
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
     container_name: ollama_mario-cnt
     ports:
       - "11434:11434"
     volumes:
       - ~/ollama_models:/root/.ollama
+      - ./Modelfile:/root/Modelfile
+      - ./init-ollama.sh:/root/init-ollama.sh
+    command: serve
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
 
 # Volumes for persistent data
 volumes:

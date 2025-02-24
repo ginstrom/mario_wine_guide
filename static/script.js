@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () { 
+    console.log('DOM Content Loaded - Initializing map...');
     // Initialize the map
     var map = L.map('map', {
         dragging: false, // Disable map dragging
@@ -15,11 +16,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Ensure the map resizes when the window is resized
     window.addEventListener('resize', function () {
+        console.log('Window resize event detected');
         // Use a small delay to ensure the container has resized
         setTimeout(function () {
             map.invalidateSize();
             if (geoJsonBounds) {
                 map.fitBounds(geoJsonBounds); // Reset the zoom to fit the bounds
+                console.log('Map resized and bounds reset');
             }
         }, 100); // Adjust the delay if needed
     });
@@ -37,23 +40,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to update the info-box content
     function updatePopupContent(content) {
+        console.log('Updating info-box content');
         document.getElementById('info-box').innerHTML = content;
     }
 
     // Get the GeoJSON path from the script tag's data attribute
     const scriptElement = document.querySelector('script[data-geojson-path]');
     const geojsonPath = scriptElement.getAttribute('data-geojson-path');
+    console.log('GeoJSON path:', geojsonPath);
 
     // Load and display the GeoJSON data for Italy's regions
+    console.log('Fetching GeoJSON data...');
     fetch(geojsonPath)
         .then(response => response.json())
         .then(data => {
+            console.log('GeoJSON data loaded successfully:', data.features.length, 'regions');
 
             // Assign colors to regions using D3 color scale
             const regionColors = {};
             data.features.forEach((feature, index) => {
                 regionColors[feature.properties.reg_name] = colorScale(index);
             });
+            console.log('Region colors assigned');
 
             // Add Italy's regions to the map
             geojson_feat = L.geoJSON(data, {
@@ -76,6 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Change color on mouseover
                     layer.on('mouseover', function (e) {
+                        console.log('Mouseover region:', feature.properties.reg_name);
                         if (!layer.selected) { // Only darken if the region is not selected
                             layer.setStyle({
                                 fillColor: darkenColor(layer.originalColor, 100) // Darken the color by 20%
@@ -94,8 +103,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Highlight the selected region on click
                     layer.on('click', function (e) {
+                        console.log('Click event detected on region:', feature.properties.reg_name);
+                        
                         // Revert the color of the previously selected region
                         if (window.selectedLayer) {
+                            console.log('Reverting previously selected region');
                             window.selectedLayer.setStyle({
                                 fillColor: window.selectedLayer.originalColor
                             });
@@ -110,9 +122,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                         // Get the selected region name
                         const regionName = feature.properties.reg_name;
-                        console.log("Selected Region:", regionName); // Debugging log
+                        console.log("Selected Region:", regionName);
                     
                         // Fetch region info from Flask backend
+                        console.log('Fetching region info from backend for:', regionName);
                         fetch('/get_region_info', {
                             method: 'POST',
                             headers: {
@@ -120,23 +133,46 @@ document.addEventListener('DOMContentLoaded', function () {
                             },
                             body: JSON.stringify({ region: regionName }),
                         })
-                        .then(response => response.json())
+                        .then(response => {
+                            console.log('Backend response status:', response.status);
+                            return response.json();
+                        })
                         .then(data => {
-                            console.log("Flask Response:", data); // Debugging log
+                            console.log("Flask Response:", data);
                     
                             // Clone the region template
-                            const template = document.getElementById('region-template').cloneNode(true);
-                            template.style.display = 'block'; // Make the cloned template visible
+                            const template = document.getElementById('region-template');
+                            if (!template) {
+                                console.error('Region template element not found');
+                                return;
+                            }
+                            const clonedTemplate = template.cloneNode(true);
+                            clonedTemplate.style.display = 'block';
 
                             // Update the placeholders with actual data
-                            template.querySelector('#region-name-placeholder').textContent = regionName;
-                            template.querySelector('#region-info-placeholder').textContent = data.info;
+                            const nameElement = clonedTemplate.querySelector('#region-name-placeholder');
+                            const infoElement = clonedTemplate.querySelector('#region-info-placeholder');
+                            
+                            if (!nameElement || !infoElement) {
+                                console.error('Template placeholders not found:', {
+                                    nameFound: !!nameElement,
+                                    infoFound: !!infoElement
+                                });
+                                return;
+                            }
+
+                            nameElement.textContent = regionName;
+                            infoElement.textContent = data.info;
 
                             // Update the info-box with the populated template
-                            updatePopupContent(template.innerHTML);
+                            updatePopupContent(clonedTemplate.innerHTML);
                         })
                         .catch(error => {
-                            console.error('Error:', error);
+                            console.error('Error fetching region info:', error);
+                            console.error('Error details:', {
+                                message: error.message,
+                                stack: error.stack
+                            });
                             updatePopupContent("Failed to load region information."); // Fallback
                         });
                     
@@ -156,21 +192,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 [bounds.getSouthWest().lat, bounds.getSouthWest().lng], // Southwest corner
                 [bounds.getNorthEast().lat, bounds.getNorthEast().lng]  // Northeast corner
             ];
+            console.log('Map bounds calculated:', geoJsonBounds);
 
             // Fit the map to the bounds of the feature group
             map.fitBounds(geoJsonBounds);
+            console.log('Map fitted to bounds');
 
         })
-        .catch(error => console.error('Error loading GeoJSON data:', error));
+        .catch(error => {
+            console.error('Error loading GeoJSON data:', error);
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack
+            });
+        });
 
     // Function to revert the selection and update the popup
     function revertSelection() {
+        console.log('Reverting selection');
         if (window.selectedLayer) {
             window.selectedLayer.setStyle({
                 fillColor: window.selectedLayer.originalColor
             });
             window.selectedLayer.selected = false; // Mark the region as unselected
             window.selectedLayer = null; // Clear the selected region
+            console.log('Selection cleared');
         }
 
         // Revert to general information about Italy
@@ -180,21 +226,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Check if the click is outside the map container
     document.addEventListener('click', function (event) {
-        const mapContainer = document.getElementById('map-container'); // Replace with your map container's ID
-        const customPopup = document.getElementById('info-box'); // Replace with your custom popup's ID
-        const image = document.getElementById('map-logo'); // Replace with your image's ID
+        const mapContainer = document.getElementById('map-container');
+        const customPopup = document.getElementById('info-box');
+        const image = document.getElementById('map-logo');
 
         // Check if the click is outside the map container or on the image
         if (
             (!mapContainer.contains(event.target) && !customPopup.contains(event.target)) ||
             image.contains(event.target)
         ) {
+            console.log('Click detected outside map container');
             revertSelection();
         }
     });
 
     // Revert to general information when clicking outside the map
     map.on('click', function (e) {
+        console.log('Map click event at coordinates:', e.latlng);
         // Check if the click is on a GeoJSON feature
         const isClickOnFeature = geojson_feat.getLayers().some(layer => {
             return layer.getBounds().contains(e.latlng);
@@ -202,12 +250,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Only revert the selection if the click is NOT on a GeoJSON feature
         if (!isClickOnFeature) {
+            console.log('Click was not on a region - reverting selection');
             revertSelection();
         }
     });
 
     // Initialize the popup with general information
     window.onload = function () {
+        console.log('Window loaded - initializing popup');
         const generalInfo = document.getElementById('general-info').innerHTML;
         updatePopupContent(generalInfo);
     };
